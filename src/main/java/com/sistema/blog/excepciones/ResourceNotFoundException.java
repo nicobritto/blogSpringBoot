@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)//el valor que va rsponder esta clase cuando se la llame va ser un no encontrado
-public class RecursoNoEncontradoException extends RuntimeException {
+public class ResourceNotFoundException extends RuntimeException {
 
     private String nombreDelRecurso;
     private String nombreDelCampo;
     private Long valorDelCampo;
 
-    public RecursoNoEncontradoException(String nombreDelRecurso, String nombreDelCampo, Long valorDelCampo) {
+    public ResourceNotFoundException(String nombreDelRecurso, String nombreDelCampo, Long valorDelCampo) {
         super(String.format("%s no encontrado con : %s : '%s'", nombreDelRecurso, nombreDelCampo, valorDelCampo));
         this.nombreDelRecurso = nombreDelRecurso;
         this.nombreDelCampo = nombreDelCampo;

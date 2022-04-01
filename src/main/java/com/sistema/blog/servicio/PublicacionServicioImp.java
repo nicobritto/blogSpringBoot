@@ -1,8 +1,9 @@
 package com.sistema.blog.servicio;
 
 import com.sistema.blog.dto.PublicacionDTO;
+import com.sistema.blog.dto.PublicacionRespuesta;
 import com.sistema.blog.entidades.Publicacion;
-import com.sistema.blog.excepciones.RecursoNoEncontradoException;
+import com.sistema.blog.excepciones.ResourceNotFoundException;
 import com.sistema.blog.repositorio.PublicacionRepositorio;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,13 +33,25 @@ public class PublicacionServicioImp implements PublicacionServicio {
 //-------------------------------------------------------------------
 
     @Override
-    public List<PublicacionDTO> obtenerTodasLasPublicaciones(int numeroDePagina, int medidaDePagina) {
-        Pageable pageable = PageRequest.of(numeroDePagina, medidaDePagina);
+    public PublicacionRespuesta obtenerTodasLasPublicaciones(int numeroDePagina, int medidaDePagina,String ordenarPor,String sortDir) {
+       // Sort sort=sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(ordenarPor).ascending():Sort.by(ordenarPor).descending();
+       Sort sort=sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(ordenarPor).ascending():Sort.by(ordenarPor).descending();
+       Pageable pageable = PageRequest.of(numeroDePagina, medidaDePagina,sort);
 
         Page<Publicacion> publicaciones = publicacionRepositorio.findAll(pageable);
 
         List<Publicacion> listaDePublicaciones = publicaciones.getContent();
-        return listaDePublicaciones.stream().map(publicacion -> mapearDTO(publicacion)).collect(Collectors.toList());
+        List<PublicacionDTO>contenido= listaDePublicaciones.stream().map(publicacion -> mapearDTO(publicacion)).collect(Collectors.toList());
+        PublicacionRespuesta publicacionRespuesta=new PublicacionRespuesta();
+        publicacionRespuesta.setContenido(contenido);
+        publicacionRespuesta.setNumeroDePagina(publicaciones.getNumber());
+        publicacionRespuesta.setMedidaDePagina(publicaciones.getSize());
+        publicacionRespuesta.setTotalDeElementos(publicaciones.getTotalElements());
+        publicacionRespuesta.setTotalDePaginas(publicaciones.getTotalPages());
+        publicacionRespuesta.setUltima(publicaciones.isLast());//isLast sirtve para ver si es la ultima
+        
+        return publicacionRespuesta;
+        
     }
 
 //----------------------------------------------------------------------------
@@ -69,7 +83,7 @@ public class PublicacionServicioImp implements PublicacionServicio {
     public PublicacionDTO ObtenerPublicacionPorId(long id) {
 
         Publicacion publicacion = publicacionRepositorio.findById(id)//buscamos publicacion por id si no la encontramos
-                .orElseThrow(() -> new RecursoNoEncontradoException("Publicacion", "id", id));//si no la encontramos retornamos una excepcion
+                .orElseThrow(() -> new ResourceNotFoundException("Publicacion", "id", id));//si no la encontramos retornamos una excepcion
 
         return mapearDTO(publicacion);
     }
@@ -79,7 +93,7 @@ public class PublicacionServicioImp implements PublicacionServicio {
     public PublicacionDTO actualizarPublicacion(PublicacionDTO publicacionDTO, long id) {
 
         Publicacion publicacion = publicacionRepositorio.findById(id)//buscamos publicacion por id si no la encontramos
-                .orElseThrow(() -> new RecursoNoEncontradoException("Publicacion", "id", id));//si no la encontramos retornamos una excepcion
+                .orElseThrow(() -> new ResourceNotFoundException("Publicacion", "id", id));//si no la encontramos retornamos una excepcion
 
         publicacion.setTitulo(publicacionDTO.getTitulo());
         publicacion.setDescripcion(publicacionDTO.getDescripcion());
@@ -94,7 +108,7 @@ public class PublicacionServicioImp implements PublicacionServicio {
     @Override
     public void eliminarPublicacion(long id) {
         Publicacion publicacion = publicacionRepositorio.findById(id)//buscamos publicacion por id si no la encontramos
-                .orElseThrow(() -> new RecursoNoEncontradoException("Publicacion", "id", id));//si no la encontramos retornamos una excepcion
+                .orElseThrow(() -> new ResourceNotFoundException("Publicacion", "id", id));//si no la encontramos retornamos una excepcion
 
         publicacionRepositorio.delete(publicacion);
 

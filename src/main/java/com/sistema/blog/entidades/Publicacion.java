@@ -1,36 +1,40 @@
 package com.sistema.blog.entidades;
 
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import lombok.Data;
 
 @Entity
-@Table(name = "publicaciones",uniqueConstraints ={@UniqueConstraint(columnNames ="titulo" )} )
+@Table(name = "publicaciones", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "titulo")})
 public class Publicacion {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "titulo",nullable = false )
+
+    @Column(name = "titulo", nullable = false)
     private String titulo;
-    
-    @Column(name = "descripcion",nullable = false )
+
+    @Column(name = "descripcion", nullable = false)
     private String descripcion;
-    
-    @Column(name = "contenido",nullable = false )
+
+    @Column(name = "contenido", nullable = false)
     private String contenido;
 
-    
-    
+    @OneToMany(mappedBy = "publicacion", cascade = CascadeType.ALL, orphanRemoval = true)//orphanRemoval cada vez q se elimine un dato se eliminaran los datos asociados a el en otra tabla
+    private Set<Comentario> comentarios = new HashSet<>();
+
     public Publicacion() {
     }
-    
 
     public Publicacion(Long id) {
         this.id = id;
@@ -79,10 +83,5 @@ public class Publicacion {
     public String toString() {
         return "Publicacion{" + "id=" + id + ", titulo=" + titulo + ", descripcion=" + descripcion + ", contenido=" + contenido + '}';
     }
-    
-    
-    
-    
-    
-    
+
 }

@@ -1,10 +1,10 @@
 package com.sistema.blog.controlador;
 
 import com.sistema.blog.dto.PublicacionDTO;
+import com.sistema.blog.dto.PublicacionRespuesta;
 import com.sistema.blog.servicio.PublicacionServicio;
-import java.util.List;
+import com.sistema.blog.utilerias.AppConstantes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,10 +25,12 @@ public class PublicacionControlador {
     private PublicacionServicio publicacionServicio;
 
     @GetMapping
-    public List<PublicacionDTO> listarPublicaciones(
-            @RequestParam(value = "numeroDePaguinaPageNumber", defaultValue = "0", required = false) int numeroDePaguina,
-            @RequestParam(value = "pageSize", defaultValue = "8", required = false) int medidaDeLaPaguina) {
-        return publicacionServicio.obtenerTodasLasPublicaciones(numeroDePaguina,medidaDeLaPaguina);
+    public PublicacionRespuesta listarPublicaciones(
+            @RequestParam(value = "numerodePaguinaPageNumber", defaultValue = AppConstantes.NUMERO_DE_PAGINA_POR_DEFECTO, required = false) int numeroDePagina,
+            @RequestParam(value = "pageSize", defaultValue = AppConstantes.MEDIDA_DE_PAGINA_POR_DEFECTO, required = false) int medidaDePagina,
+            @RequestParam(value = "sortBy", defaultValue = AppConstantes.ORDENAR_POR_DEFECTO, required = false) String ordenarPor,
+            @RequestParam(value = "sortDir", defaultValue = AppConstantes.ORDENAR_DIRECCION_POR_DEFECTO, required = false) String sortDir) {
+        return publicacionServicio.obtenerTodasLasPublicaciones(numeroDePagina, medidaDePagina, ordenarPor, sortDir);
     }
 //---------------------------
 
