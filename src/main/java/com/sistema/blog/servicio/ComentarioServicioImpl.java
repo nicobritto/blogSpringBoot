@@ -9,6 +9,8 @@ import com.sistema.blog.entidades.Publicacion;
 import com.sistema.blog.excepciones.ResourceNotFoundException;
 import com.sistema.blog.repositorio.ComentarioRepositorio;
 import com.sistema.blog.repositorio.PublicacionRepositorio;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ComentarioServicioImpl implements ComentarioServicio {
@@ -56,4 +58,11 @@ public class ComentarioServicioImpl implements ComentarioServicio {
 
     }
 
+    @Override
+    public List<ComentarioDTO> obtenerComentariosPorPublicacionId(long publicacionId) {
+        List<Comentario>comentarios=comentarioRepositorio.findByPublicacionId(publicacionId);
+
+        return comentarios.stream().map(comentario -> mapearDTO(comentario)).collect(Collectors.toList());
+    }
+ kl.,
 }
