@@ -25,6 +25,18 @@ public class ComentarioControlador {
     @Autowired
     private ComentarioServicio comentarioServicio;
 
+    @GetMapping("/publicaciones/{publicacionId}/comentarios")
+    public List<ComentarioDTO> listarComentariosPorPublicacionId(@PathVariable(value = "publicacionId") Long publicacionId) {
+        return comentarioServicio.obtenerComentariosPorPublicacionId(publicacionId);
+    }
+
+    @GetMapping("/publicaciones/{publicacionId}/comentarios/{id}")
+    public ResponseEntity<ComentarioDTO> obtenerComentarioPorId(@PathVariable(value = "publicacionId") Long publicacionId, @PathVariable(value = "id") Long comentarioId) {
+        ComentarioDTO comentarioDTO = comentarioServicio.obtenerComentarioPorId(publicacionId, comentarioId);
+
+        return new ResponseEntity<>(comentarioDTO, HttpStatus.OK);
+    }
+
     @PostMapping("/publicaciones/{publicacionId}/comentarios")
     public ResponseEntity<ComentarioDTO> guardarComentario(@PathVariable(value = "publicacionId") long publicacionId, @RequestBody ComentarioDTO comentarioDTO) {
         return new ResponseEntity<>(comentarioServicio.crearComentario(publicacionId, comentarioDTO), HttpStatus.CREATED);

@@ -9,4 +9,8 @@ public interface ComentarioServicio {
 
     public List<ComentarioDTO>obtenerComentariosPorPublicacionId(long publicacionId);
     
+    public ComentarioDTO  obtenerComentarioPorId(Long publicacionId,Long comentarioId);
+    
+    
+    
 }
