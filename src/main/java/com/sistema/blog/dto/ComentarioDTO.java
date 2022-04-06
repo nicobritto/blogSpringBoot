@@ -1,10 +1,22 @@
 package com.sistema.blog.dto;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
+
 public class ComentarioDTO {
 
     private long id;
+
+    @NotEmpty(message = "el nombre no debe estar vacio")
     private String nombre;
+
+    @NotEmpty(message = "el email debe estar vacio o nulo")
+    @Email
     private String email;
+
+    @NotEmpty
+    @Size(min = 10, message = "La descrip de la publi debe tener al menos 10 caracteres")
     private String cuerpo;
 
     public long getId() {

@@ -1,5 +1,6 @@
 package com.sistema.blog.entidades;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -30,6 +31,7 @@ public class Publicacion {
     @Column(name = "contenido", nullable = false)
     private String contenido;
 
+    @JsonBackReference//esta notacion es para resolver una lista de errores largas
     @OneToMany(mappedBy = "publicacion", cascade = CascadeType.ALL, orphanRemoval = true)//orphanRemoval cada vez q se elimine un dato se eliminaran los datos asociados a el en otra tabla
     private Set<Comentario> comentarios = new HashSet<>();
 
@@ -53,6 +55,14 @@ public class Publicacion {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Set<Comentario> getComentarios() {
+        return comentarios;
+    }
+
+    public void setComentarios(Set<Comentario> comentarios) {
+        this.comentarios = comentarios;
     }
 
     public String getTitulo() {

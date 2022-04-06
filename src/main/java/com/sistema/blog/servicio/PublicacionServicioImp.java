@@ -7,6 +7,7 @@ import com.sistema.blog.excepciones.ResourceNotFoundException;
 import com.sistema.blog.repositorio.PublicacionRepositorio;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,9 @@ public class PublicacionServicioImp implements PublicacionServicio {
 
     @Autowired
     private PublicacionRepositorio publicacionRepositorio;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public PublicacionDTO crearPublicacion(PublicacionDTO publicacionDTO) {//DTO objeto tranferencia de datos
@@ -33,49 +37,25 @@ public class PublicacionServicioImp implements PublicacionServicio {
 //-------------------------------------------------------------------
 
     @Override
-    public PublicacionRespuesta obtenerTodasLasPublicaciones(int numeroDePagina, int medidaDePagina,String ordenarPor,String sortDir) {
-       // Sort sort=sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(ordenarPor).ascending():Sort.by(ordenarPor).descending();
-       Sort sort=sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(ordenarPor).ascending():Sort.by(ordenarPor).descending();
-       Pageable pageable = PageRequest.of(numeroDePagina, medidaDePagina,sort);
+    public PublicacionRespuesta obtenerTodasLasPublicaciones(int numeroDePagina, int medidaDePagina, String ordenarPor, String sortDir) {
+        // Sort sort=sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(ordenarPor).ascending():Sort.by(ordenarPor).descending();
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(ordenarPor).ascending() : Sort.by(ordenarPor).descending();
+        Pageable pageable = PageRequest.of(numeroDePagina, medidaDePagina, sort);
 
         Page<Publicacion> publicaciones = publicacionRepositorio.findAll(pageable);
 
         List<Publicacion> listaDePublicaciones = publicaciones.getContent();
-        List<PublicacionDTO>contenido= listaDePublicaciones.stream().map(publicacion -> mapearDTO(publicacion)).collect(Collectors.toList());
-        PublicacionRespuesta publicacionRespuesta=new PublicacionRespuesta();
+        List<PublicacionDTO> contenido = listaDePublicaciones.stream().map(publicacion -> mapearDTO(publicacion)).collect(Collectors.toList());
+        PublicacionRespuesta publicacionRespuesta = new PublicacionRespuesta();
         publicacionRespuesta.setContenido(contenido);
         publicacionRespuesta.setNumeroDePagina(publicaciones.getNumber());
         publicacionRespuesta.setMedidaDePagina(publicaciones.getSize());
         publicacionRespuesta.setTotalDeElementos(publicaciones.getTotalElements());
         publicacionRespuesta.setTotalDePaginas(publicaciones.getTotalPages());
         publicacionRespuesta.setUltima(publicaciones.isLast());//isLast sirtve para ver si es la ultima
-        
+
         return publicacionRespuesta;
-        
-    }
 
-//----------------------------------------------------------------------------
-    //este metodo convierte entidad  a DTO
-    private PublicacionDTO mapearDTO(Publicacion publicacion) {
-        PublicacionDTO publicacionDTO = new PublicacionDTO();
-        publicacionDTO.setId(publicacion.getId());
-        publicacionDTO.setTitulo(publicacion.getTitulo());
-        publicacionDTO.setDescripcion(publicacion.getDescripcion());
-        publicacionDTO.setContenido(publicacion.getContenido());
-
-        return publicacionDTO;
-    }
-//--------------------------------------------------------------------------------
-    //convierte de DTO a Entidad
-
-    private Publicacion mapearEntidad(PublicacionDTO publicacionDTO) {
-        Publicacion publicacion = new Publicacion();
-
-        publicacion.setTitulo(publicacionDTO.getTitulo());
-        publicacion.setDescripcion(publicacionDTO.getDescripcion());
-        publicacion.setContenido(publicacionDTO.getContenido());
-
-        return publicacion;
     }
 
     //------------------------------------------------------------------------
@@ -112,6 +92,21 @@ public class PublicacionServicioImp implements PublicacionServicio {
 
         publicacionRepositorio.delete(publicacion);
 
+    }
+
+    //----------------------------------------------------------------------------
+    //este metodo convierte entidad  a DTO
+    private PublicacionDTO mapearDTO(Publicacion publicacion) {
+        PublicacionDTO publicacionDTO = modelMapper.map(publicacion, PublicacionDTO.class);
+        return publicacionDTO;
+    }
+//--------------------------------------------------------------------------------
+    //convierte de DTO a Entidad
+
+    private Publicacion mapearEntidad(PublicacionDTO publicacionDTO) {
+        Publicacion publicacion = modelMapper.map(publicacionDTO, Publicacion.class);
+
+        return publicacion;
     }
 
 }
